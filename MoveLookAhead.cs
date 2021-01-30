@@ -1,6 +1,6 @@
 ﻿namespace TileAuto
 {
-    public class MinMaxB
+    public class MoveLookAhead
     {
         private readonly Direction[] directions = new Direction[] { Direction.Down, Direction.Up, Direction.Left, Direction.Right };
         private readonly BoardScorer boardScorer = new BoardScorer();

@@ -99,15 +99,6 @@ namespace TileAuto
             }
             return target;
         }
-
-        //private static byte SumNibles(byte a, byte b)
-        //{
-        //    if (b == 0)
-        //        return a;
-
-        //    return SumNibles((byte)(a ^ b), (byte)((a & b) << 1));
-        //}
-
         public static IEnumerable<byte> GetNibblesFromRow(int row, ulong target)
         {
             // byte[] bytes = new byte[4];

@@ -6,7 +6,7 @@ namespace TileAuto
     public class AutoPlay
     {
         private readonly GameEngine gameEngine = new GameEngine();
-        private readonly MinMaxB minMax = new MinMaxB();
+        private readonly MoveLookAhead moveLookAhead = new MoveLookAhead();
         public void Play()
         {
             (int games, int total, int wins) = StartTrial(1000);
@@ -26,7 +26,7 @@ namespace TileAuto
                 bool isRunning = true;
                 while (isRunning)
                 {
-                    var direction = minMax.GetBestMove(gameEngine.GetBoardTiles());
+                    var direction = moveLookAhead.GetBestMove(gameEngine.GetBoardTiles());
                     int score = PlayMove(direction);
                     isRunning = gameEngine.CompleteMove();
                     total += score;
@@ -62,7 +62,7 @@ namespace TileAuto
             await Task.Delay(350);
             while (isRunning && !Console.KeyAvailable)
             {
-                var direction = minMax.GetBestMove(gameEngine.GetBoard().GetTiles());
+                var direction = moveLookAhead.GetBestMove(gameEngine.GetBoard().GetTiles());
                 int score = PlayMove(direction);
                 isRunning = gameEngine.CompleteMove();
                 total += score;
