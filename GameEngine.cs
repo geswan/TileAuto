@@ -35,7 +35,7 @@ namespace TileAuto
         {
             if (!tileCollection.HasBoardChanged())
             {
-                return true;//do nothing
+                return true;//do nothing - not a valid move
             }
             int tileId = tileCollection.GetNewTileId();
             var newtileValue = tileCollection.GetRandomTileValue();
