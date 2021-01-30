@@ -1,6 +1,6 @@
 ﻿namespace TileAuto
 {
-    public class MoveLookAhead
+    public class MoveLookAhead : IMoveSelector
     {
         private readonly Direction[] directions = new Direction[] { Direction.Down, Direction.Up, Direction.Left, Direction.Right };
         private readonly BoardScorer boardScorer = new BoardScorer();

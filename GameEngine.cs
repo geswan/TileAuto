@@ -35,7 +35,7 @@ namespace TileAuto
         {
             if (!tileCollection.HasBoardChanged())
             {
-                return true;
+                return true;//do nothing
             }
             int tileId = tileCollection.GetNewTileId();
             var newtileValue = tileCollection.GetRandomTileValue();
@@ -46,7 +46,7 @@ namespace TileAuto
                 IsWinner = true;
                 return false;
             }
-            //if all tiles are occupied check that there is still a possible match
+            //if all tiles are occupied, check that there is still a possible match
             if (tileCollection.GetIsCollectionFull())
             { //It's game over if there's not a match.
                 return IsAMatchPossible(tileCollection);

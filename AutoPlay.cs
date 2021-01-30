@@ -59,7 +59,7 @@ namespace TileAuto
             bool isRunning = true;
             int total = 0;
             ShowTiles(total, firstRow, firstCol);
-            await Task.Delay(350);
+            await Task.Delay(100);
             while (isRunning && !Console.KeyAvailable)
             {
                 var direction = moveLookAhead.GetBestMove(gameEngine.GetBoard().GetTiles());
@@ -76,14 +76,12 @@ namespace TileAuto
             Console.WriteLine(result);
         }
         private void ShowTiles(int score, int topRow, int topCol)
-        {
+        {    //Any resizing of the window will set its visibility
+            Console.CursorVisible = false;
             Console.SetCursorPosition(topRow, topCol);
             Console.WriteLine($"Score {score}");
-            //    Console.Clear();
             topRow += 2;
-            //   Console.WriteLine(score);
-            //  Console.WriteLine();
-            for (int y = 0; y < 4; y++)
+             for (int y = 0; y < 4; y++)
             {
                 for (int x = 0; x < 4; x++)
                 {
@@ -112,7 +110,7 @@ namespace TileAuto
             ShowTiles(total, firstRow, firstCol);
             while (isRunning)
             {
-                Console.CursorVisible = false;//resizing window sets it
+                Console.CursorVisible = false;
                 var direction = ChooseMove();
                 if (direction == Direction.UnKnown) break;
                 int score = PlayMove(direction);
