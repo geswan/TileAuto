@@ -14,7 +14,7 @@ namespace TileAuto
             return CheckForASpace(masked);
         }
 
-        public static ushort CleanRow(ushort row, Direction direction)
+        private static ushort CleanRow(ushort row, Direction direction)
         {
             bool isShiftRt = direction == Direction.Right || direction == Direction.Down;
             ushort result = 0;
@@ -38,31 +38,6 @@ namespace TileAuto
             return result;
         }
 
-        public static (ushort, int score) Slide(IEnumerable<byte> bytes, Direction direction)
-        {
-            bool isReversed = direction == Direction.Right || direction == Direction.Down;
-            byte[] slideArray = isReversed ? bytes.Reverse().ToArray() : bytes.ToArray();
-            int slideScore = 0;
-            for (int index = 0; index < slideArray.Length - 1; index++)
-            {
-                //step over empty tile
-                if ((slideArray[index] != 0) && slideArray[index + 1] == 0)
-                {
-                    slideArray[index + 1] = slideArray[index];
-                    slideArray[index] = 0;
-                }
-                if (slideArray[index] != 0 && slideArray[index] == slideArray[index + 1])
-                {
-                    slideArray[index + 1] = 0;
-                    slideArray[index] += 1;
-                    int newValue = slideArray[index];
-                    slideScore += (int)1 << newValue;
-                }
-            }
-            ushort rowAsShort = isReversed ? SetNibblesAsShort(slideArray.Reverse().ToArray()) : SetNibblesAsShort(slideArray);
-            ushort cleanedRow = CleanRow(rowAsShort, direction);
-            return (cleanedRow, slideScore);
-        }
 
         public static (ushort, int score) SlideLeft(IEnumerable<byte> bytes, Direction direction)
         {
@@ -113,7 +88,7 @@ namespace TileAuto
             ushort cleanedRow = CleanRow(rowAsShort, direction);
             return (cleanedRow, slideScore);
         }
-        public static ushort SetNibblesAsShort(byte[] bytes)
+        private static ushort SetNibblesAsShort(byte[] bytes)
         {
             ushort target = 0;
             int shiftCount = 0;
@@ -125,13 +100,13 @@ namespace TileAuto
             return target;
         }
 
-        private static byte SumNibles(byte a, byte b)
-        {
-            if (b == 0)
-                return a;
+        //private static byte SumNibles(byte a, byte b)
+        //{
+        //    if (b == 0)
+        //        return a;
 
-            return SumNibles((byte)(a ^ b), (byte)((a & b) << 1));
-        }
+        //    return SumNibles((byte)(a ^ b), (byte)((a & b) << 1));
+        //}
 
         public static IEnumerable<byte> GetNibblesFromRow(int row, ulong target)
         {

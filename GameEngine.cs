@@ -40,7 +40,7 @@ namespace TileAuto
             int tileId = tileCollection.GetNewTileId();
             var newtileValue = tileCollection.GetRandomTileValue();
             tileCollection[tileId] = newtileValue;
-            UpdateAllTiles(true);
+            UpdateAllTiles(false);
             if (tileCollection.CheckForAWin())
             {
                 IsWinner = true;
