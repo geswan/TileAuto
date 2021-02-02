@@ -42,11 +42,10 @@ namespace TileAuto
 
                     cornerTiles += BitShifter.GetNibbleFromIndex(i, board);
                 }
-
-                foreach (var e in edges)
-                {
-                    mono += Math.Abs(BitShifter.GetNibbleFromIndex(i, board) - BitShifter.GetNibbleFromIndex(e, board));
-                }
+                     foreach (var e in edges)
+                    {
+                        mono += Math.Abs(BitShifter.GetNibbleFromIndex(i, board) - BitShifter.GetNibbleFromIndex(e, board));
+                    }
 
             }
             int spaces = BitShifter.CountSpaces(board);

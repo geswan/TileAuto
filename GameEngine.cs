@@ -118,5 +118,21 @@ namespace TileAuto
         {
             TileUpdatedEvent?.Invoke(this, args);
         }
+
+        public string ShowHex(ulong x)
+        { //a hex string is expressed high bits to low
+            string space = "0000000000000000";
+            string s = x.ToString("X");
+            return s.Length < 16 ? space.Substring(0, 16 - s.Length) + s : s;
+        }
+     public   string GetBoardAsHexString()
+        {
+            return ShowHex(tileCollection.GetTiles());
+        }
+
+        public string GetPrevBoardAsHexString()
+        {
+            return ShowHex(tileCollection.GetBackupTiles());
+        }
     }
 }

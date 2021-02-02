@@ -9,8 +9,8 @@ namespace TileAuto
         {
             //Console.SetWindowSize(40, 15);
             AutoPlay autoPlay = new AutoPlay();
-            //autoPlay.Play();
-            //	autoPlay.PlayGameManualMove();
+         //  autoPlay.Play();
+          // 	autoPlay.PlayGameManualMove();
             await autoPlay.PlayGameAsync();
             Console.ReadLine();
         }

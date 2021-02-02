@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace TileAuto
 {
@@ -14,94 +12,101 @@ namespace TileAuto
             return CheckForASpace(masked);
         }
 
-        private static ushort CleanRow(ushort row, Direction direction)
+
+        public static (ushort, int score) SlideLeftB(ushort test, Direction direction)
         {
-            bool isShiftRt = direction == Direction.Right || direction == Direction.Down;
+            ushort row = test;
+            int slideScore = 0;
+            int slideRt = 0;
+            int slideLt = 12;
+            ushort mask = 0xF000;
             ushort result = 0;
-            ushort mask = 0xF;
-            int shiftCount = 0;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 3; i++)
             {
-                ushort temp = ((ushort)(row & mask));
-                result = (ushort)(result | (temp >> shiftCount));
-                if (temp == 0)
+                //get the 2 bytes to compare from the row
+                ushort temp = (ushort)(row & (mask >> slideRt));
+                byte a = (byte)(temp >> (12 - slideRt));
+                slideRt += 4;
+                temp = (ushort)(row & (mask >> slideRt));
+                byte b = (byte)(temp >> (12 - slideRt));
+                //step over a zero
+                if (a != 0 && b == 0)
                 {
-                    shiftCount += 4;
+                    //update the row, make the b byte= to the a byte
+                    //no need for a mask as b byte was already zero
+                    row = (ushort)(row | (ushort)(a << (12 - slideRt)));
+                    a = 0;
                 }
-                mask = (ushort)(mask << 4);
+                //check for a match
+                if (a != 0 && a == b)
+                {
+
+                    //set the  b byte to zero on the row to prevent it being matched again
+                    row = (ushort)(row & (ushort)~(mask >> slideRt));
+                    a += 1;
+                    slideScore += 1 << a;
+                }
+                if (a != 0)
+                {
+                    //update the result
+                    result = (ushort)(result | (a << slideLt));
+                    slideLt -= 4;
+                }
             }
-            if (!isShiftRt && shiftCount != 0)
-            {
-                //pad the result with zeros on the right
-                result = (ushort)(result << (shiftCount));
-            }
-            return result;
+            //Finally,update the result with the last byte in 'row'
+            result = (ushort)(result | (ushort)(row & 0x000F) << slideLt);
+            return (result, slideScore);
         }
 
 
-        public static (ushort, int score) SlideLeft(IEnumerable<byte> bytes, Direction direction)
+        public static (ushort, int score) SlideRightB(ushort test, Direction direction)
         {
-            byte[] slideArray = bytes.ToArray();
+            ushort row = test;
             int slideScore = 0;
-            for (int index = 0; index < 3; index++)
+            int slideRt = 0;
+            int slideLt = 0;
+            ushort mask = 0x000F;
+            ushort result = 0;
+            for (int i = 3; i > 0; i--)
             {
-                //step over empty tile
-                if ((slideArray[index] != 0) && slideArray[index + 1] == 0)
+                //get the 2 bytes to compare from the row
+                ushort temp = (ushort)(row & (mask << slideLt));
+                byte a = (byte)(temp >> slideLt);
+                slideLt += 4;
+                temp = (ushort)(row & (mask << slideLt));
+                byte b = (byte)(temp >> slideLt);
+                //step over a zero
+                if (a != 0 && b == 0)
                 {
-                    slideArray[index + 1] = slideArray[index];
-                    slideArray[index] = 0;
+                    //update the row, make the b byte= to the a byte
+                    //no need for a mask as b byte was already zero
+                    row = (ushort)(row | (ushort)(a << slideLt));
+                    a = 0;
                 }
-                if (slideArray[index] != 0 && slideArray[index] == slideArray[index + 1])
+                //check for a match, ignore 0==0
+                if (a != 0 && a == b)
                 {
-                    slideArray[index + 1] = 0;
-                    slideArray[index] += 1;
-                    int newValue = slideArray[index];
-                    slideScore += (int)1 << newValue;
+                    //set the  b byte to zero on the row to prevent it being matched again
+                    row = (ushort)(row & (ushort)~(mask << slideLt));
+                    a += 1;
+                    slideScore += 1 << a;
+                }
+                if (a != 0)
+                {
+                    //update the result
+                    result = (ushort)(result | (a << slideRt));
+                    slideRt += 4;
                 }
             }
-            ushort rowAsShort = SetNibblesAsShort(slideArray);
-            ushort cleanedRow = CleanRow(rowAsShort, direction);
-            return (cleanedRow, slideScore);
+
+            //Finally,update the result with the last byte in 'row'
+            result = (ushort)(result | (ushort)(row & 0xF000) >> (12 - slideRt));
+            return (result, slideScore);
         }
 
-        public static (ushort, int score) SlideRight(IEnumerable<byte> bytes, Direction direction)
-        {
-            byte[] slideArray = bytes.ToArray();
-            int slideScore = 0;
-            for (int index = 3; index > 0; index--)
-            {
-                //step over empty tile
-                if ((slideArray[index] != 0) && slideArray[index - 1] == 0)
-                {
-                    slideArray[index - 1] = slideArray[index];
-                    slideArray[index] = 0;
-                }
-                if (slideArray[index] != 0 && slideArray[index] == slideArray[index - 1])
-                {
-                    slideArray[index - 1] = 0;
-                    slideArray[index] += 1;
-                    int newValue = slideArray[index];
-                    slideScore += (int)1 << newValue;
-                }
-            }
-            ushort rowAsShort = SetNibblesAsShort(slideArray);
-            ushort cleanedRow = CleanRow(rowAsShort, direction);
-            return (cleanedRow, slideScore);
-        }
-        private static ushort SetNibblesAsShort(byte[] bytes)
-        {
-            ushort target = 0;
-            int shiftCount = 0;
-            for (int i = 3; i >= 0; i--)
-            {
-                target = (ushort)(target | ((ushort)(bytes[i] << shiftCount)));
-                shiftCount += 4;
-            }
-            return target;
-        }
+
         public static IEnumerable<byte> GetNibblesFromRow(int row, ulong target)
         {
-            // byte[] bytes = new byte[4];
             int shiftCount = row * 16;
             for (int i = 0; i < 4; i++)
             {
@@ -112,28 +117,39 @@ namespace TileAuto
 
         }
 
+        public static ushort GetRowAsShort(int row, ulong target)
+        {
+            int shiftCount = row * 16;
+            ulong mask = 0xFFFF000000000000 >> shiftCount;
+            return (ushort)((target & mask) >> (48 - shiftCount));
+
+        }
+
+
         private static bool IsMatchPossibleOnRows(ulong target)
         {
-            byte[] bytes = new byte[4];
-            for (int row = 0; row < 4; row++)
+            ushort mask = 0xF000;
+            for (int i = 0; i < 4; i++)
             {
-                int shiftCount = row * 16;
-                for (int i = 0; i < 4; i++)
+                var row = GetRowAsShort(i, target);
+                int slideRt = 0;
+                for (int n = 0; n < 3; n++)
                 {
-                    ulong mask = 0xF000000000000000 >> shiftCount;
-                    bytes[i] = (byte)((target & mask) >> (60 - shiftCount));
-                    shiftCount += 4;
-                }
-                for (int i = 0; i < 3; i++)
-                {
-                    if (bytes[i] == bytes[i + 1])
-                        return true;
-                }
 
+                    //get the 2 bytes to compare from the row
+                    ushort temp = (ushort)(row & (mask >> slideRt));
+                    byte a = (byte)(temp >> (12 - slideRt));
+                    slideRt += 4;
+                    temp = (ushort)(row & (mask >> slideRt));
+                    byte b = (byte)(temp >> (12 - slideRt));
+                    if (a == b)
+                    {
+                        return true;
+                    }
+                }
             }
             return false;
         }
-
 
         public static bool IsMatchPossible(ulong target)
         {
@@ -190,9 +206,9 @@ namespace TileAuto
             return (board != 0);
         }
 
-        public static int[] IndexSpaces(ulong board)
+        public static IEnumerable<int> IndexSpacesB(ulong board)
         {
-            List<int> spaces = new List<int>();
+            //avoid using an array
             ulong mask = 0x8000000000000000;
             board = ((board & 0x7777777777777777) + 0x7777777777777777) | board;
             board = ~board & 0x8888888888888888;
@@ -200,11 +216,11 @@ namespace TileAuto
             {
                 if ((board & mask) != 0)
                 {
-                    spaces.Add(i);
+                    yield return i;
                 }
                 mask >>= 4;
             }
-            return spaces.ToArray();
+
         }
 
         public static ulong TransposeRowsToCols(ulong board)

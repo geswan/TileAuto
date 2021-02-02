@@ -34,7 +34,7 @@
         private int TestFollowingMove(ulong board)
         {
 
-            var emptyTiles = BitShifter.IndexSpaces(board);
+            var emptyTiles = BitShifter.IndexSpacesB(board);
             int evTotal = 0;
             foreach (int index in emptyTiles)
             {

@@ -44,6 +44,11 @@ namespace TileAuto
             return board;
         }
 
+        public ulong GetBackupTiles()
+        {
+            return backUp;
+        }
+
         public TileCollectionB Clone()
         {
             return new TileCollectionB(board, backUp);
@@ -72,7 +77,7 @@ namespace TileAuto
 
         public IEnumerable<int> GetEmptyTileIndices()
         {
-            return BitShifter.IndexSpaces(board);
+            return BitShifter.IndexSpacesB(board);
         }
 
         public bool CheckForAWin()

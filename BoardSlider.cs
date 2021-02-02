@@ -20,12 +20,12 @@
 
         private static (int score, ulong board) SlideRowB(Direction direction, int rowIndex, ulong target)
         {
-            var rowAsArray = BitShifter.GetNibblesFromRow(rowIndex, target);
-            var (rowAsShort, score) = direction == Direction.Right || direction == Direction.Down ?
-               BitShifter.SlideRight(rowAsArray, direction) : BitShifter.SlideLeft(rowAsArray, direction);
+            var rowAsShort = BitShifter.GetRowAsShort(rowIndex, target);
+            var (slidRow, score) = direction == Direction.Right || direction == Direction.Down ?
+               BitShifter.SlideRightB(rowAsShort, direction) : BitShifter.SlideLeftB(rowAsShort, direction);
             int shiftCount = rowIndex * 16;
             ulong rowMask = 0xFFFF000000000000 >> shiftCount;
-            ulong update = (ulong)rowAsShort << (48 - shiftCount);
+            ulong update = (ulong)slidRow << (48 - shiftCount);
             //OR in the updated row. (AND ~rowmask clears the old value)
             target = (target & ~rowMask) | update;
             return (score, target);

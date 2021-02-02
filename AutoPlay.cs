@@ -7,7 +7,7 @@ namespace TileAuto
     {
         private readonly GameEngine gameEngine = new GameEngine();
         private readonly MoveLookAhead moveLookAhead = new MoveLookAhead();
-        public void Play()
+         public void Play()
         {
             (int games, int total, int wins) = StartTrial(1000);
             Console.WriteLine($"Games {games} Wins {wins} Total {total}");
@@ -99,7 +99,7 @@ namespace TileAuto
         public void PlayGameManualMove()
         {
             Console.Clear();
-            Console.WriteLine("Key W=Up S=Down A=Left D=Right Q=Quit.");
+            Console.WriteLine(" Key W=Up S=Down A=Left D=Right Q=Quit.");
             int firstCol = Console.CursorTop;
             int firstRow = Console.CursorLeft + 1;
             Console.CursorVisible = false;
